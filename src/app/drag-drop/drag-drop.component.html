@@ -1,0 +1,63 @@
+<input type="file" (change)="handleFileInput($event)" />
+<div *ngIf="informacionDisponible">
+  
+  <div>
+    <div cdkDropList
+        class="hola"
+        #ln1="cdkDropList"
+        [cdkDropListData]="listNumbers1"
+        [cdkDropListConnectedTo]="[ln2, ln3]"
+        (cdkDropListDropped)="drop($event)"
+    >
+    <div cdkDrag class="block" *ngFor="let n of listNumbers1">
+    <ul>
+      <li>  <span> {{n.marca}} - {{n.tipo}} - {{n.clase}} </span> </li>
+    </ul>
+    </div>
+    </div>
+
+    <hr>
+    <hr>
+
+    <div cdkDropList
+        class="hola"
+        #ln2="cdkDropList"
+        [cdkDropListData]="listNumbers2"
+        [cdkDropListConnectedTo]="[ln1, ln3]"
+        (cdkDropListDropped)="drop($event)"
+    >
+    <div cdkDrag class="block" *ngFor="let n of listNumbers2">
+      <ul>
+        <li>  <span> {{n.marca}} - {{n.tipo}} - {{n.clase}} </span> </li>
+      </ul>
+    </div>
+    </div>
+
+    <hr>
+    <hr>
+
+    <div cdkDropList
+        class="hola"
+        #ln3="cdkDropList"
+        [cdkDropListData]="listNumbers3"
+        [cdkDropListConnectedTo]="[ln1, ln2]"
+        (cdkDropListDropped)="drop($event)"
+    >
+    <div cdkDrag class="block" *ngFor="let n of listNumbers3">
+      <ul>
+        <li>  <span> {{n.marca}} - {{n.tipo}} - {{n.clase}} </span> </li>
+      </ul>
+    </div>
+    </div>
+  
+  </div>
+
+  <!--<button (click)="exportData()">Descargar CSV</button>-->
+  <button (click)="exportData()" >Descargar XLSX</button>
+
+</div>
+
+
+<div  *ngIf="informacionNoDisponible">
+  <p>Formato no aceptado</p>
+</div>
