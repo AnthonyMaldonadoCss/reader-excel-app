@@ -14,11 +14,9 @@ export class DragDropComponent implements OnInit {
   public informacionDisponible;
   public informacionNoDisponible;
   public groupedData;
-  public listNumbers1;
-  public listNumbers2;
-  public listNumbers3;
+  public dropListIds;
   public diccionario;
-
+  public globalData;
   constructor(
     private dowloadFileService : DownloadFileService
   ) { }
@@ -27,9 +25,8 @@ export class DragDropComponent implements OnInit {
     this.groupedData = {};
     this.informacionDisponible = false
     this.informacionNoDisponible = false
-    this.listNumbers1 = []
-    this.listNumbers2 = []
-    this.listNumbers3 = []
+    this.dropListIds = [];
+    this.globalData = [];
     this.diccionario = {
       á: "a",
       é: "e",
@@ -54,7 +51,7 @@ export class DragDropComponent implements OnInit {
 
       const jsonData = XLSX.utils.sheet_to_json(worksheet, { raw: false });
 
-        const objetoNormalizado = jsonData.map((item: any) => {
+        const normalizedObject = jsonData.map((item: any) => {
           const normalizedItem = {};
 
           Object.keys(item).forEach((key) => {
@@ -64,24 +61,16 @@ export class DragDropComponent implements OnInit {
 
             normalizedItem[normalizedKey] = item[key];
           });
-
           return normalizedItem;
         });
+        this.globalData = normalizedObject;
 
-      const categorys = [...new Set(objetoNormalizado.map((item: any) => item.categoria))];
-
-
+      const categorys = [...new Set(normalizedObject.map((item: any) => item.categoria))];
+      this.dropListIds = categorys;
       categorys.forEach((category: string, i: number) => {
-
-        if(category == "Electrónica"){
-          this.listNumbers1.push(...objetoNormalizado.filter((item: any) => item.categoria === category));
-        }
-        else if(category == 'Electrodomésticos'){
-          this.listNumbers2.push(...objetoNormalizado.filter((item: any) => item.categoria === category));
-        }
-        else if(category == 'Herramientas'){
-          this.listNumbers3.push(...objetoNormalizado.filter((item: any) => item.categoria === category));
-        }
+        
+        this.groupedData[category] = normalizedObject
+          .filter((item: any) => item.categoria === category);
       });
       this.informacionDisponible = true;
      }
@@ -91,8 +80,17 @@ export class DragDropComponent implements OnInit {
     };
     fileReader.readAsArrayBuffer(file);
   }
+  generarID(category: string): string {
+    const id = category;
+    this.dropListIds.push(id);
+    return id;
+  }
+  getConnectedLists(id: string): any[] {
+    return [... new Set(this.dropListIds)].filter(dropListId => dropListId !== id);
+  }
   drop($event: CdkDragDrop<Number[]>){
-
+    const nextCategoria = $event.container.id;
+    
     if($event.previousContainer === $event.container){
       moveItemInArray(
         $event.container.data,
@@ -107,10 +105,18 @@ export class DragDropComponent implements OnInit {
         $event.previousIndex,
         $event.currentIndex
       )
+      const data = $event.container.data;
+      const diff: any = data.filter((d:any) => d.categoria != nextCategoria);
+      this.globalData = this.globalData.reduce((acc, data) => {
+        if(data.id == diff.id){
+          data.categoria == nextCategoria
+        }
+        return this.globalData
+      }, this.globalData)
     }
   }
   exportData(): void {
-    const rawArray = this.listNumbers1.concat(this.listNumbers2.concat(this.listNumbers3));
+    const rawArray = this.globalData
     const data = this.dowloadFileService.createXlsx(rawArray);
     saveAs(data, 'data.xlsx');
   }
