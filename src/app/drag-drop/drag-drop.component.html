@@ -2,61 +2,30 @@
 <div *ngIf="informacionDisponible">
   
   <div>
+
+  <ng-container *ngFor="let category of groupedData | ObjToArray">
+    <p> Categoria: <b>{{category}}</b></p>
     <div cdkDropList
-        class="hola"
-        #ln1="cdkDropList"
-        [cdkDropListData]="listNumbers1"
-        [cdkDropListConnectedTo]="[ln2, ln3]"
+        class="container"
+        id="drop drop--list"
+        [id]="generarID(category)"
+        [cdkDropListData]="groupedData[category]"
+        [cdkDropListConnectedTo]="getConnectedLists(category)"
         (cdkDropListDropped)="drop($event)"
     >
-    <div cdkDrag class="block" *ngFor="let n of listNumbers1">
-    <ul>
-      <li>  <span> {{n.marca}} - {{n.tipo}} - {{n.clase}} </span> </li>
-    </ul>
-    </div>
-    </div>
-
-    <hr>
-    <hr>
-
-    <div cdkDropList
-        class="hola"
-        #ln2="cdkDropList"
-        [cdkDropListData]="listNumbers2"
-        [cdkDropListConnectedTo]="[ln1, ln3]"
-        (cdkDropListDropped)="drop($event)"
-    >
-    <div cdkDrag class="block" *ngFor="let n of listNumbers2">
+    <div cdkDrag class="block" *ngFor="let item of groupedData | KeysToArray: category">
       <ul>
-        <li>  <span> {{n.marca}} - {{n.tipo}} - {{n.clase}} </span> </li>
+        <li><span>{{ item.marca }} - {{ item.tipo }} - {{ item.clase }}</span></li>
       </ul>
     </div>
     </div>
 
     <hr>
     <hr>
-
-    <div cdkDropList
-        class="hola"
-        #ln3="cdkDropList"
-        [cdkDropListData]="listNumbers3"
-        [cdkDropListConnectedTo]="[ln1, ln2]"
-        (cdkDropListDropped)="drop($event)"
-    >
-    <div cdkDrag class="block" *ngFor="let n of listNumbers3">
-      <ul>
-        <li>  <span> {{n.marca}} - {{n.tipo}} - {{n.clase}} </span> </li>
-      </ul>
-    </div>
-    </div>
-  
+  </ng-container>
   </div>
-
-  <!--<button (click)="exportData()">Descargar CSV</button>-->
   <button (click)="exportData()" >Descargar XLSX</button>
-
 </div>
-
 
 <div  *ngIf="informacionNoDisponible">
   <p>Formato no aceptado</p>
